@@ -16,19 +16,10 @@ type Trace struct {
 }
 
 func (t *Trace) Span(name string) *Span {
-	ctx := &SpanContext{
-		traceid:   t.id,
-		spanid:    xid.New().String(),
-		parrentId: "-",
-		baggage:   map[string]string{},
-	}
-
-	s := &Span{
-		context: ctx,
-		name:    name,
-	}
-	defer s.Start()
-	return s
+	context := NewSpanContext(t.id, "-")
+	span := InitSpan(context, name)
+	defer span.Start()
+	return span
 }
 
 func (t *Trace) Finish() {
