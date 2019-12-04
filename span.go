@@ -50,16 +50,22 @@ func (s *Span) Child(name string) *Span {
 	return span
 }
 
-func (s *Span) AddLog(kv *KV) {
-	s.s.Logs[kv.key] = kv.value
+func (s *Span) AddLog(kvs ...*KV) {
+	for _, kv := range kvs {
+		s.s.Logs[kv.key] = kv.value
+	}
 }
 
-func (s *Span) AddTag(kv *KV) {
-	s.s.Tags[kv.key] = kv.value
+func (s *Span) AddTag(kvs ...*KV) {
+	for _, kv := range kvs {
+		s.s.Tags[kv.key] = kv.value
+	}
 }
 
-func (s Span) AddBaggage(kv *KV) {
-	s.s.SpanContext.Baggage[kv.key] = kv.value
+func (s Span) AddBaggage(kvs ...*KV) {
+	for _, kv := range kvs {
+		s.s.SpanContext.Baggage[kv.key] = kv.value
+	}
 }
 
 func (s *Span) StartTime() {

@@ -5,11 +5,6 @@ import (
 	"github.com/rs/xid"
 )
 
-type Tracer interface {
-	Span(name string) Spanner
-	Finish()
-}
-
 type Trace struct {
 	id   string
 	name string
