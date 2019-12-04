@@ -14,7 +14,7 @@ func FromRequest(r *http.Request, name string) (*Span, error) {
 	tags := r.Context().Value(trace).(Values).Get(tags)[0] //k:v;kv;...;kv:kv
 	if traceId != "" && spanId != "" {
 		span := InitSpan(NewSpanContext(traceId, spanId), name)
-		defer span.Start()
+		defer span.StartTime()
 
 		if tags != "" {
 			span.ingestTags(tags)
@@ -30,7 +30,7 @@ func FromContext(ctx context.Context, name string) (*Span, error) {
 	tags := ctx.Value(trace).(*Values).Get(tags)[0] //k:v;kv;...;kv:kv
 	if traceId != "" && spanId != "" {
 		span := InitSpan(NewSpanContext(traceId, spanId), name)
-		defer span.Start()
+		defer span.StartTime()
 
 		if tags != "" {
 			span.ingestTags(tags)
@@ -49,7 +49,7 @@ func FromGRPCContext(ctx context.Context, name string) (*Span, error) {
 		tags := md[tags][0] //k:v;kv;...;kv:kv
 		if traceId != "" && spanId != "" {
 			span := InitSpan(NewSpanContext(traceId, spanId), name)
-			defer span.Start()
+			defer span.StartTime()
 
 			if tags != "" {
 				span.ingestTags(tags)

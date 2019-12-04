@@ -18,7 +18,7 @@ type Trace struct {
 func (t *Trace) Span(name string) *Span {
 	context := NewSpanContext(t.id, "-")
 	span := InitSpan(context, name)
-	defer span.Start()
+	defer span.StartTime()
 	return span
 }
 

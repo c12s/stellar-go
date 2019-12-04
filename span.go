@@ -9,19 +9,6 @@ import (
 	"time"
 )
 
-type Spanner interface {
-	Child(name string) *Span
-	AddLog(kv *KV)
-	AddTag(kv *KV)
-	AddBaggage(kv *KV)
-	StartTime(startTime int64)
-	EndTime(endtime int64)
-	Finish() // send data to collecto and maybe serialize to ctx ot request
-	Serialize() *Values
-	Start()
-	Marshall() ([]byte, error)
-}
-
 type SpanContext struct {
 	s *sPb.SpanContext
 }
@@ -59,7 +46,7 @@ func InitSpan(c *SpanContext, name string) *Span {
 func (s *Span) Child(name string) *Span {
 	context := NewSpanContext(s.s.SpanContext.TraceId, s.s.SpanContext.ParrentSpanId)
 	span := InitSpan(context, name)
-	defer span.Start()
+	defer span.StartTime()
 	return span
 }
 
@@ -75,16 +62,16 @@ func (s Span) AddBaggage(kv *KV) {
 	s.s.SpanContext.Baggage[kv.key] = kv.value
 }
 
-func (s *Span) StartTime(t int64) {
-	s.s.StartTime = t
+func (s *Span) StartTime() {
+	s.s.StartTime = time.Now().Unix()
 }
 
-func (s *Span) EndTime(t int64) {
-	s.s.EndTime = t
+func (s *Span) EndTime() {
+	s.s.EndTime = time.Now().Unix()
 }
 
 func (s *Span) Finish() {
-	s.s.EndTime = time.Now().Unix()
+	s.EndTime()
 	//send to colledtor
 	fmt.Println(fmt.Sprintf("Span.Finish() %d", (s.s.EndTime - s.s.StartTime)))
 	data, err := s.Marshall()
@@ -92,7 +79,10 @@ func (s *Span) Finish() {
 		fmt.Println(err.Error())
 		return
 	}
-	fmt.Println(data)
+	err = Log(data, s.s.SpanContext.TraceId, s.s.SpanContext.SpanId)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
 }
 
 func (span *Span) Serialize() *Values {
@@ -120,10 +110,6 @@ func (s *Span) digestTags() string {
 
 func (s *Span) String() string {
 	return fmt.Sprintf("Span: %s %s", s.s.SpanContext, s.s.Name)
-}
-
-func (s *Span) Start() {
-	s.s.StartTime = time.Now().Unix()
 }
 
 func (s *Span) Marshall() ([]byte, error) {
