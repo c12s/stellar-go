@@ -7,7 +7,6 @@ import (
 )
 
 func main() {
-	fmt.Println("Hello world")
 	trace := Init("test-trace")
 	defer trace.Finish()
 
@@ -15,8 +14,6 @@ func main() {
 	defer span.Finish()
 
 	fmt.Println(span)
-
-	time.Sleep(2 * time.Second)
 
 	child(NewTracedContext(context.TODO(), span))
 	child2(NewTracedContext(context.TODO(), span))
