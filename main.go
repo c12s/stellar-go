@@ -15,8 +15,8 @@ func main() {
 
 	// fmt.Println(span)
 
-	// child(NewTracedContext(context.TODO(), span))
-	// child2(NewTracedContext(context.TODO(), span))
+	// child(NewTracedContext(context.Background(), span))
+	// child2(NewTracedContext(context.Background(), span))
 
 	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(62*time.Second))
 	defer cancel()

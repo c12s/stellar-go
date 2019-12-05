@@ -13,7 +13,7 @@ type Spanner interface {
 	AddBaggage(kvs ...*KV)
 	StartTime()
 	EndTime()
-	Finish() // send data to collecto and maybe serialize to ctx ot request
+	Finish() // send data to collector and maybe serialize to ctx ot request
 	Serialize() *Values
 	Marshall() ([]byte, error)
 }
