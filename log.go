@@ -1,4 +1,4 @@
-package main
+package gostellar
 
 import (
 	"context"
