@@ -80,3 +80,8 @@ func NewTracedGRPCContext(ctx context.Context, span Spanner) context.Context {
 		return metadata.NewOutgoingContext(context.Background(), span.Serialize().md)
 	}
 }
+
+func TracedRequest(r *http.Request, span Spanner) *http.Request {
+	c := context.WithValue(context.Background(), trace, span.Serialize())
+	return r.WithContext(c)
+}
