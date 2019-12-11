@@ -9,9 +9,9 @@ import (
 )
 
 func FromRequest(r *http.Request, name string) (Spanner, error) {
-	traceId := r.Context().Value(trace).(Values).Get(trace_id)[0]
-	spanId := r.Context().Value(trace).(Values).Get(span_id)[0]
-	tags := r.Context().Value(trace).(Values).Get(tags)[0] //k:v;kv;...;kv:kv
+	traceId := r.Context().Value(trace).(*Values).Get(trace_id)[0]
+	spanId := r.Context().Value(trace).(*Values).Get(span_id)[0]
+	tags := r.Context().Value(trace).(*Values).Get(tags)[0] //k:v;kv;...;kv:kv
 	if traceId != "" && spanId != "" {
 		span := InitSpan(NewSpanContext(traceId, spanId), name)
 		defer span.StartTime()
