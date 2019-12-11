@@ -8,7 +8,7 @@ import (
 	"net/http"
 )
 
-func FromRequest(r *http.Request, name string) (*Span, error) {
+func FromRequest(r *http.Request, name string) (Spanner, error) {
 	traceId := r.Context().Value(trace).(Values).Get(trace_id)[0]
 	spanId := r.Context().Value(trace).(Values).Get(span_id)[0]
 	tags := r.Context().Value(trace).(Values).Get(tags)[0] //k:v;kv;...;kv:kv
@@ -24,7 +24,7 @@ func FromRequest(r *http.Request, name string) (*Span, error) {
 	return nil, errors.New("No trace context in request")
 }
 
-func FromContext(ctx context.Context, name string) (*Span, error) {
+func FromContext(ctx context.Context, name string) (Spanner, error) {
 	traceId := ctx.Value(trace).(*Values).Get(trace_id)[0]
 	spanId := ctx.Value(trace).(*Values).Get(span_id)[0]
 	tags := ctx.Value(trace).(*Values).Get(tags)[0] //k:v;kv;...;kv:kv
@@ -40,7 +40,7 @@ func FromContext(ctx context.Context, name string) (*Span, error) {
 	return nil, errors.New("No trace in context")
 }
 
-func FromGRPCContext(ctx context.Context, name string) (*Span, error) {
+func FromGRPCContext(ctx context.Context, name string) (Spanner, error) {
 	// Read metadata from client.
 	md, ok := metadata.FromIncomingContext(ctx)
 	if ok {
@@ -56,6 +56,23 @@ func FromGRPCContext(ctx context.Context, name string) (*Span, error) {
 			}
 			return span, nil
 		}
+	}
+	return nil, errors.New("No trace in context")
+}
+
+func FromResponse(w http.ResponseWriter, name string) (Spanner, error) {
+	traceId := w.Header().Get(trace_id)
+	spanId := w.Header().Get(span_id)
+	// parrentSpanId := w.Header().Get(parrent_span_id)
+	tags := w.Header().Get(tags)
+	if traceId != "" && spanId != "" {
+		span := InitSpan(NewSpanContext(traceId, spanId), name)
+		defer span.StartTime()
+
+		if tags != "" {
+			span.ingestTags(tags)
+		}
+		return span, nil
 	}
 	return nil, errors.New("No trace in context")
 }
@@ -84,4 +101,13 @@ func NewTracedGRPCContext(ctx context.Context, span Spanner) context.Context {
 func TracedRequest(r *http.Request, span Spanner) *http.Request {
 	c := context.WithValue(context.Background(), trace, span.Serialize())
 	return r.WithContext(c)
+}
+
+func TracedResponse(w http.ResponseWriter, span Spanner) http.ResponseWriter {
+	s := span.Serialize()
+	w.Header().Set(trace_id, s.Get(trace_id)[0])
+	w.Header().Set(span_id, s.Get(span_id)[0])
+	w.Header().Set(parrent_span_id, s.Get(parrent_span_id)[0])
+	w.Header().Set(tags, s.Get(tags)[0])
+	return w
 }

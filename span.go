@@ -52,19 +52,19 @@ func (s *Span) Child(name string) *Span {
 
 func (s *Span) AddLog(kvs ...*KV) {
 	for _, kv := range kvs {
-		s.s.Logs[kv.key] = kv.value
+		s.s.Logs[kv.Key] = kv.Value
 	}
 }
 
 func (s *Span) AddTag(kvs ...*KV) {
 	for _, kv := range kvs {
-		s.s.Tags[kv.key] = kv.value
+		s.s.Tags[kv.Key] = kv.Value
 	}
 }
 
 func (s Span) AddBaggage(kvs ...*KV) {
 	for _, kv := range kvs {
-		s.s.SpanContext.Baggage[kv.key] = kv.value
+		s.s.SpanContext.Baggage[kv.Key] = kv.Value
 	}
 }
 
@@ -95,6 +95,7 @@ func (span *Span) Serialize() *Values {
 	s := map[string][]string{}
 	s[trace_id] = []string{span.s.SpanContext.TraceId}
 	s[span_id] = []string{span.s.SpanContext.SpanId}
+	s[parrent_span_id] = []string{span.s.SpanContext.ParrentSpanId}
 	s[tags] = []string{span.digestTags()}
 	return &Values{md: s}
 }
@@ -102,7 +103,7 @@ func (span *Span) Serialize() *Values {
 func (s *Span) ingestTags(existing string) {
 	for _, pair := range strings.Split(existing, tag_sep) {
 		val := strings.Split(pair, pair_sep)
-		s.AddTag(&KV{key: val[0], value: val[1]})
+		s.AddTag(&KV{Key: val[0], Value: val[1]})
 	}
 }
 

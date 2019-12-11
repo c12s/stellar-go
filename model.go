@@ -32,8 +32,8 @@ type Collector interface {
 }
 
 type KV struct {
-	key   string
-	value string
+	Key   string
+	Value string
 }
 
 type Values struct {
