@@ -69,11 +69,11 @@ func (s Span) AddBaggage(kvs ...*KV) {
 }
 
 func (s *Span) StartTime() {
-	s.s.StartTime = time.Now().Unix().UnixNano() / mil //milliseconds
+	s.s.StartTime = time.Now().UnixNano() / mil //milliseconds
 }
 
 func (s *Span) EndTime() {
-	s.s.EndTime = time.Now().Unix().UnixNano() / mil // milliseconds
+	s.s.EndTime = time.Now().UnixNano() / mil // milliseconds
 }
 
 func (s *Span) Finish() {
