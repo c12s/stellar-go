@@ -79,7 +79,7 @@ func (s *Span) EndTime() {
 func (s *Span) Finish() {
 	s.EndTime()
 	//send to colledtor
-	fmt.Println(fmt.Sprintf("Span.Finish() %d ms", (s.s.EndTime - s.s.StartTime)))
+	fmt.Println(fmt.Sprintf("Span[%s].Finish() %d ms", s.s.SpanContext.SpanId, (s.s.EndTime - s.s.StartTime)))
 	data, err := s.Marshall()
 	if err != nil {
 		fmt.Println(err.Error())
