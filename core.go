@@ -3,6 +3,7 @@ package gostellar
 import (
 	"context"
 	"errors"
+	"fmt"
 	"google.golang.org/grpc/metadata"
 	"io"
 	"net/http"
@@ -43,6 +44,7 @@ func FromContext(ctx context.Context, name string) (Spanner, error) {
 func FromGRPCContext(ctx context.Context, name string) (Spanner, error) {
 	// Read metadata from client.
 	md, ok := metadata.FromIncomingContext(ctx)
+	fmt.Println(md)
 	if ok {
 		traceId := md[trace_id][0]
 		spanId := md[span_id][0]
