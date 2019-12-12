@@ -15,4 +15,6 @@ const (
 
 	tag_sep  = ";"
 	pair_sep = ":"
+
+	mil = 1000000
 )
