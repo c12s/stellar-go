@@ -92,7 +92,7 @@ func NewTracedContext(ctx context.Context, span Spanner) context.Context {
 
 func NewTracedGRPCContext(ctx context.Context, span Spanner) context.Context {
 	if ctx != nil {
-		return metadata.NewOutgoingContext(context.Background(), span.Serialize().md)
+		return metadata.NewOutgoingContext(ctx, span.Serialize().md)
 	} else {
 		return metadata.NewOutgoingContext(context.Background(), span.Serialize().md)
 	}
