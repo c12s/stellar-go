@@ -3,6 +3,7 @@ package gostellar
 import (
 	"context"
 	"errors"
+	sPb "github.com/c12s/scheme/stellar"
 	"google.golang.org/grpc/metadata"
 	"io"
 	"net/http"
@@ -58,6 +59,21 @@ func FromGRPCContext(ctx context.Context, name string) (Spanner, error) {
 		}
 	}
 	return nil, errors.New("No trace in context")
+}
+
+func FromCustomSource(ctx *sPb.SpanContext, tags map[string]string, name string) (Spanner, error) {
+	// Read metadata from client.
+	if ctx != nil {
+		span := InitSpan(&SpanContext{ctx}, name)
+		defer span.StartTime()
+
+		for k, v := range tags {
+			span.AddTag(&KV{k, v})
+		}
+
+		return span, nil
+	}
+	return nil, errors.New("No trace in custom source")
 }
 
 func FromResponse(w http.ResponseWriter, name string) (Spanner, error) {
